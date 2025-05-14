@@ -1,0 +1,106 @@
+<!-- index.html --><!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kendriya Vidyalaya Event Gallery</title>
+  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      background: #f4f8fb;
+      color: #333;
+    }
+    header {
+      background: linear-gradient(to right, #004080, #0066cc);
+      color: white;
+      text-align: center;
+      padding: 2rem 1rem;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    #calendar {
+      max-width: 1000px;
+      margin: 2rem auto;
+      background: white;
+      border-radius: 10px;
+      padding: 1rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .event-details {
+      max-width: 1000px;
+      margin: 1rem auto;
+      padding: 1rem;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .gallery {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1rem;
+    }
+    .gallery img, .gallery iframe {
+      max-width: 300px;
+      border-radius: 10px;
+      transition: transform 0.3s ease;
+    }
+    .gallery img:hover, .gallery iframe:hover {
+      transform: scale(1.05);
+    }
+    footer {
+      text-align: center;
+      padding: 1rem;
+      background: #004080;
+      color: white;
+      margin-top: 2rem;
+    }
+  </style>
+</head>
+<body>
+  <header data-aos="fade-down">
+    <h1>Kendriya Vidyalaya NTPC Kayamkulam</h1>
+    <p>Interactive Day-wise Event Gallery (2025-26)</p>
+  </header>  <div id="calendar"></div>  <div class="event-details" id="event-details" data-aos="fade-up">
+    <h3>Select a date on the calendar to view event photos and videos.</h3>
+  </div>  <footer>
+    &copy; 2025 Kendriya Vidyalaya NTPC Kayamkulam. Designed with care.
+  </footer>  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>  <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>  <script>
+    AOS.init();
+
+    async function loadEvents() {
+      const response = await fetch('events.json');
+      return await response.json();
+    }
+
+    document.addEventListener('DOMContentLoaded', async function () {
+      const calendarEl = document.getElementById('calendar');
+      const events = await loadEvents();
+
+      const calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        events: events,
+        eventClick: function (info) {
+          const event = info.event;
+          const container = document.getElementById('event-details');
+          container.innerHTML = `<h3>${event.title}</h3>`;
+          let html = '<div class="gallery">';
+          const photos = event.extendedProps.photos || [];
+          const videos = event.extendedProps.videos || [];
+          photos.forEach(photo => {
+            html += `<img src="${photo}" alt="Event photo">`;
+          });
+          videos.forEach(video => {
+            html += `<iframe src="${video}" frameborder="0" allowfullscreen></iframe>`;
+          });
+          html += '</div>';
+          container.innerHTML += html;
+          AOS.refresh();
+        }
+      });
+
+      calendar.render();
+    });
+  </script></body>
+</html>
